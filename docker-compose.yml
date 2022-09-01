@@ -1,21 +1,61 @@
 version: '3'
 
 services:
+  ##### PHP #####
+  php:
+    container_name: cinema_api_php
+    build:
+      context: ./docker
+      dockerfile: Dockerfile-php
+      args:
+        TIMEZONE: "Europe/Warsaw"
+    volumes:
+      - ./:/var/www:cached
+    networks:
+      - cinema_api
+  ##### END PHP #####
+
+  ##### NGINX #####
+  nginx:
+    container_name: cinema_api_nginx
+    build:
+      context: ./docker
+      dockerfile: Dockerfile-nginx
+    depends_on:
+      - php
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public/:/var/www/public
+      - /var/www/vendor
+      - /var/www/node_modules
+    networks:
+      - cinema_api
+  ##### END NGINX #####
 ###> doctrine/doctrine-bundle ###
   database:
-    image: postgres:${POSTGRES_VERSION:-14}-alpine
+    container_name: cinema_api_db
+    image: mariadb:10.6
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DATABASE_NAME:-cinema_api_db}
+      MYSQL_USER: ${DATABASE_USER:-cinema_api_user}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD:-cinema_api_password}
+    ports:
+      - "3306:3306"
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
+      - cinema-api-db-data:/var/lib/mysql
+    networks:
+      - cinema_api
       # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
       # - ./docker/db/data:/var/lib/postgresql/data:rw
 ###< doctrine/doctrine-bundle ###
 
 volumes:
 ###> doctrine/doctrine-bundle ###
-  db-data:
+  cinema-api-db-data:
 ###< doctrine/doctrine-bundle ###
+
+networks:
+  cinema_api:
+    external: true

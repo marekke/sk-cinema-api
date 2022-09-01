@@ -1,0 +1,54 @@
+FROM php:8.1.9-fpm-bullseye
+
+ARG TIMEZONE
+
+RUN apt-get clean
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git openssl mc ssh sudo zip unzip wget curl vim acl \
+    zlib1g-dev libxml2-dev libzip-dev libpq-dev libbz2-dev \
+    libfreetype6-dev libpng-dev libjpeg-dev libicu-dev \
+    libonig-dev libxslt1-dev librabbitmq-dev libssh-dev \
+    gnupg gnupg1 gnupg2 g++ procps debconf libcurl4-openssl-dev \
+    apt-transport-https apt-utils build-essential \
+    locales mailutils nodejs \
+    && echo 'alias sf="php bin/console"' >> ~/.bashrc 
+
+RUN apt-get autoclean
+
+RUN pecl install apcu \
+    && docker-php-ext-enable apcu 
+
+RUN docker-php-ext-install \
+    zip pdo pdo_mysql mysqli opcache gd intl bz2 curl \
+    xsl xml exif mbstring bcmath sockets
+
+COPY ./build/php/custom.ini /usr/local/etc/php/conf.d/
+
+# Set timezone
+RUN ln -snf /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && echo ${TIMEZONE} > /etc/timezone \
+    && printf '[PHP]\ndate.timezone = "%s"\n', ${TIMEZONE} > /usr/local/etc/php/conf.d/tzone.ini \
+    && "date"
+
+RUN docker-php-ext-configure gd --with-jpeg --with-freetype
+
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
+
+
+RUN usermod -u 1000 www-data
+RUN usermod -a -G www-data root
+RUN mkdir -p /var/www
+RUN chown -R www-data:www-data /var/www
+RUN mkdir -p /var/www/.composer
+RUN chown -R www-data:www-data /var/www/.composer
+
+COPY / /var/www
+
+WORKDIR /var/www/
+
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+RUN mkdir -p docker/php/conf.d
+RUN touch docker/php/conf.d/xdebug.ini
+RUN touch docker/php/conf.d/error_reporting.ini

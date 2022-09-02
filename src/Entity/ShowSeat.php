@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ShowSeatRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Form\Util\StringUtil;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -19,12 +21,16 @@ class ShowSeat
 
     #[ORM\ManyToOne(inversedBy: 'showSeats')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?Show $show = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ticket = null;
+
+    #[ORM\Column]
     #[NotNull]
     #[NotBlank]
-    private ?string $ticket = null;
+    private ?int $number = null;
 
     public function getId(): ?int
     {
@@ -51,6 +57,18 @@ class ShowSeat
     public function setTicket(string $ticket): self
     {
         $this->ticket = $ticket;
+
+        return $this;
+    }
+
+    public function getNumber(): ?int
+    {
+        return $this->number;
+    }
+
+    public function setNumber(int $number): self
+    {
+        $this->number = $number;
 
         return $this;
     }

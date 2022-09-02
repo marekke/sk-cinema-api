@@ -13,6 +13,7 @@ it may take a long time
 
 ### open new terminal and run:
 ```
+docker exec -it cinema_api_php composer install
 docker exec -it cinema_api_php php bin/console doctrine:migrations:migrate
 ```
 
@@ -42,3 +43,5 @@ docker-compose up
 * GET http://localhost:8080/api/shows - list of shows
 * POST http://localhost:8080/api/shows - create new show
 * DELETE http://localhost:8080/api/shows/{id} - delete show
+
+* POST http://localhost:8080/api/shows/{id}/buyTicket - buy ticket for show

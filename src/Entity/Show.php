@@ -26,11 +26,11 @@ class Show
     #[NotNull]
     private ?\DateTimeInterface $endTime = null;
 
-    #[ORM\ManyToOne(inversedBy: 'shows')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'shows')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Movie $movie = null;
 
-    #[ORM\ManyToOne(inversedBy: 'shows')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'shows')]
     private ?Room $room = null;
 
     #[ORM\OneToMany(mappedBy: 'show', targetEntity: ShowSeat::class, orphanRemoval: true)]

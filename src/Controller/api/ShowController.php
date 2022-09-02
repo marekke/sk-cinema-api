@@ -5,6 +5,7 @@ namespace App\Controller\api;
 
 
 use App\Entity\Show;
+use App\Entity\ShowSeat;
 use App\Form\ShowType;
 use App\Repository\ShowRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +22,13 @@ class ShowController extends ApiController
     ) {
     }
 
+    #[Route(null, name: 'index', methods: ['GET'])]
+    public function index(): JsonResponse
+    {
+        $shows = $this->showRepository->findAll();
+        return $this->json($shows);
+    }
+
     #[Route(null, name: 'create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
@@ -29,14 +37,24 @@ class ShowController extends ApiController
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
+
+            for ($i = 1; $i <= $show->getRoom()->getCapacity(); $i++) {
+                $seat = new ShowSeat();
+                $seat->setNumber($i);
+                $seat->setShow($show);
+                $this->entityManager->persist($seat);
+
+                $show->addShowSeat($seat);
+            }
+
             $this->entityManager->persist($show);
             $this->entityManager->flush();
 
-            return new JsonResponse([
+            return $this->json([
                 'id' => $show->getId(),
                 'roomID' => $show->getRoom()->getId(),
                 'movieID' => $show->getMovie()->getId(),
-                'seats' => $show->getShowSeats()
+                'seats' => $show->getShowSeats(),
             ]);
         }
 
@@ -58,6 +76,12 @@ class ShowController extends ApiController
         return $this->json([
             'message' => 'The show has been removed.',
         ]);
+    }
+
+    #[Route('/{id}/buyTicket', methods: ['POST'])]
+    public function buyTicket(): void
+    {
+
     }
 
 }

@@ -54,6 +54,8 @@ class ShowController extends ApiController
                 'id' => $show->getId(),
                 'roomID' => $show->getRoom()->getId(),
                 'movieID' => $show->getMovie()->getId(),
+                'showDate' => $show->getShowDate()->format('Y-m-d H:i:s'),
+                'endTime' => $show->getEndTime()->format('Y-m-d H:i:s'),
                 'movie' => $show->getMovie(),
                 'room' => $show->getRoom(),
                 'seats' => $show->getShowSeats(),

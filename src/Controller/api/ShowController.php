@@ -54,6 +54,8 @@ class ShowController extends ApiController
                 'id' => $show->getId(),
                 'roomID' => $show->getRoom()->getId(),
                 'movieID' => $show->getMovie()->getId(),
+                'movie' => $show->getMovie(),
+                'room' => $show->getRoom(),
                 'seats' => $show->getShowSeats(),
             ]);
         }

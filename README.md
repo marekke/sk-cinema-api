@@ -44,4 +44,8 @@ docker-compose up
 * POST http://localhost:8080/api/shows - create new show
 * DELETE http://localhost:8080/api/shows/{id} - delete show
 
+
 * POST http://localhost:8080/api/shows/{id}/buyTicket - buy ticket for show
+
+
+* POST http://localhost:8080/api/app/clear-database - clear data base

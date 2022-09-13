@@ -27,6 +27,18 @@ docker-compose up
 ### to stop docker containers press on terminal:
 ```ctrl + c```
 
+## authentication
+* POST http://localhost:8080/login - login user (JSON username and password)
+
+every request should have header param:
+```
+X-AUTH-TOKEN
+```
+
+available users:
+* login: marek, password: marek
+* login: sylwia, password: sylwia
+
 ## Endpoints
 * GET http://localhost:8080/api/movies - list of movies
 * POST http://localhost:8080/api/movies - create new movie
